@@ -9,7 +9,7 @@ db = SQLAlchemy(app)
 login = LoginManager(app)
 login.login_view = "login"
 
-from app import routes, models
+from app import routes, models, errors
 
 # Create db tables
 with app.app_context():
