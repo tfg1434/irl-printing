@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField
+from wtforms import *
 from wtforms.validators import DataRequired, EqualTo, ValidationError, Length
 
 from app import db
@@ -20,7 +20,7 @@ class RegistrationForm(FlaskForm):
             raise ValidationError("This username is already taken, please use a different one")
 
 class PostForm(FlaskForm):
-    post = StringField("Paste code here", validators=[DataRequired(), Length(min=1, max=1000000)])
+    post = TextAreaField("Paste code here", validators=[DataRequired(), Length(min=1, max=1000000)])
     submit = SubmitField("Submit")
 
 class FilterForm(FlaskForm):
