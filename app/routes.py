@@ -2,26 +2,41 @@ from flask import *
 from app import *
 from flask_login import current_user, login_user, logout_user, login_required
 import sqlalchemy as sa
-from app.models import User
 from urllib.parse import urlsplit
-from app.forms import LoginForm, RegistrationForm
+from app.forms import *
+from app.models import *
 
-@app.route('/')
-@app.route('/index')
+@app.route('/', methods=["GET", "POST"])
+@app.route('/index', methods=["GET", "POST"])
 @login_required
 def index():
-    posts = [
-        {
-            'author': {'username': 'John'},
-            'body': 'Beautiful day in Portland!'
-        },
-        {
-            'author': {'username': 'Susan'},
-            'body': 'The Avengers movie was so cool!'
-        }
-    ]
-    return render_template('index.html', title='Home', posts=posts)
+    form = PostForm()
+    if form.validate_on_submit():
+        post = Post(body=form.post.data, author=current_user)
+        db.session.add(post)
+        db.session.commit()
+        flash("Code was succesfully submitted")
+        return redirect(url_for("index"))
+    
+    filter_form = FilterForm()
+    page = request.args.get("page", 1, type=int)
+    if request.args.get("my") == "on":
+        query = sa.select(Post).where(Post.author == current_user)
+    else:
+        query = sa.select(Post)
+    pages = db.paginate(query, page=page, per_page=app.config["POSTS_PER_PAGE"], error_out=False)
+    next_url = url_for("index", page=pages.next_num, my=request.args.get("my")) if pages.has_next else None
+    prev_url = url_for("index", page=pages.prev_num, my=request.args.get("my")) if pages.has_prev else None
 
+    return render_template('index.html', title='Home', form=form, filter_form=filter_form, posts=pages.items, next_url=next_url, prev_url=prev_url)
+
+# @app.route("/explore")
+# @login_required
+# def explore():
+#     page = request.args.get("page", 1, type=int)
+#     posts = sa.select(Post)
+#     posts = db.paginate(posts, page=page, per_page=app.config["POSTS_PER_PAGE"], error_out=False)
+#     return render_template("index.html", title="Explore", posts=posts)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():

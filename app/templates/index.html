@@ -2,7 +2,61 @@
 
 {% block content %}
     <h1>Hi, {{ current_user.username }}!</h1>
+
+    <form action="" method="POST">
+        {{ form.hidden_tag() }}
+        <p>
+        {{ form.post.label }}<br>
+        {{ form.post(rows=64, cols=32) }} <br>
+        {% for error in form.post.errors %}
+        <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+        {{ form.submit }}
+        </p>
+    </form>
+
     {% for post in posts %}
     <div><p>{{ post.author.username }} says: <b>{{ post.body }}</b></p></div>
     {% endfor %}
+    <div>
+        {% if prev_url %}
+        <a href="{{prev_url}}">Previous page</a>
+        {% endif %}
+
+        {% if next_url %}
+        <a href="{{next_url}}">Next page</a>
+        {% endif %}
+    </div>
+
+    <form action="" method="POST">
+        <p>
+            {{filter_form.my.label}}<br>
+            {{filter_form.my()}}<br>
+        </p>
+    </form>
+
+    <script>
+        let my_select = document.getElementById("my");
+        let onload = function() {
+            let url = new URL(location.href);
+            if (url.searchParams.get("my") == "on") {
+                my_select.checked = true;
+            }
+        };
+        onload();
+
+        update = function() {
+            let url = new URL(location.href);
+            if (my_select.checked) {
+                url.searchParams.set("my", "on");
+            } else {
+                url.searchParams.delete("my");
+            }
+            if (url.toString() != location.href) {
+                location.href = url.toString();
+            }
+        };
+        my_select.onchange = update;
+    </script>
+
 {% endblock %}
