@@ -24,11 +24,11 @@ def index():
         query = sa.select(Post).where(Post.author == current_user)
     else:
         query = sa.select(Post)
-    pages = db.paginate(query, page=page, per_page=app.config["POSTS_PER_PAGE"], error_out=False)
-    next_url = url_for("index", page=pages.next_num, my=request.args.get("my")) if pages.has_next else None
-    prev_url = url_for("index", page=pages.prev_num, my=request.args.get("my")) if pages.has_prev else None
+    # pages = db.paginate(query, page=page, per_page=app.config["POSTS_PER_PAGE"], error_out=False)
+    # next_url = url_for("index", page=pages.next_num, my=request.args.get("my")) if pages.has_next else None
+    # prev_url = url_for("index", page=pages.prev_num, my=request.args.get("my")) if pages.has_prev else None
 
-    return render_template('index.html', title='Home', form=form, filter_form=filter_form, posts=pages.items, next_url=next_url, prev_url=prev_url)
+    return render_template('index.html', title='Home', form=form, filter_form=filter_form, posts=db.session.scalars(query).all())
 
 # @app.route("/explore")
 # @login_required

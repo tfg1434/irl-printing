@@ -18,15 +18,6 @@
     {% for post in posts %}
     <div><p>{{ post.author.username }} says: <b>{{ post.body }}</b></p></div>
     {% endfor %}
-    <div>
-        {% if prev_url %}
-        <a href="{{prev_url}}">Previous page</a>
-        {% endif %}
-
-        {% if next_url %}
-        <a href="{{next_url}}">Next page</a>
-        {% endif %}
-    </div>
 
     <form action="" method="POST">
         <p>
