@@ -2,19 +2,37 @@
 {% import "bootstrap_wtf.html" as wtf %}
 
 {% block content %}
-    <script src="http://ajaxorg.github.io/ace-builds/src/ace.js"></script>
-
     <h1>Hi, {{ current_user.username }}!</h1>
 
     {{ wtf.quick_form(form) }}
 
-    {% for post in posts %}
-    <div><p>{{ post.author.username }} says: <b>{{ post.body }}</b></p></div>
-    {% endfor %}
-
     {{ wtf.quick_form(filter_form) }}
 
+    <table id="submissions" class="display">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>When</th>
+                <th>Who</th>
+                <th>Problem</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for post in posts %}
+            <tr>
+                <td><a>placeholder</a></td>
+                <td>5 minutes ago</td>
+                <td>{{post.author.username}}</td>
+                <td>Problem ZZZ</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
     <script>
+        // DataTable, wut dis?
+        $('#submissions').DataTable();
+
         // we will change the value of the textarea through ACE
         function createEditor(id) {
             // find the textarea

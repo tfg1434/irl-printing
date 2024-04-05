@@ -19,24 +19,22 @@ def index():
         return redirect(url_for("index"))
     
     filter_form = FilterForm()
-    page = request.args.get("page", 1, type=int)
     if request.args.get("my") == "on":
         query = sa.select(Post).where(Post.author == current_user)
     else:
         query = sa.select(Post)
-    # pages = db.paginate(query, page=page, per_page=app.config["POSTS_PER_PAGE"], error_out=False)
-    # next_url = url_for("index", page=pages.next_num, my=request.args.get("my")) if pages.has_next else None
-    # prev_url = url_for("index", page=pages.prev_num, my=request.args.get("my")) if pages.has_prev else None
+    posts = db.session.scalars(query).all()
 
-    return render_template('index.html', title='Home', form=form, filter_form=filter_form, posts=db.session.scalars(query).all())
+    return render_template('index.html', title='Home', form=form, filter_form=filter_form, posts=posts)
 
-# @app.route("/explore")
-# @login_required
-# def explore():
-#     page = request.args.get("page", 1, type=int)
-#     posts = sa.select(Post)
-#     posts = db.paginate(posts, page=page, per_page=app.config["POSTS_PER_PAGE"], error_out=False)
-#     return render_template("index.html", title="Explore", posts=posts)
+@app.route("/admin")
+@login_required
+def explore():
+    if current_user.username != "her":
+        return redirect(url_for("index"))
+
+    posts = db.session.scalars(sa.select(Post))
+    return render_template("index.html", title="Admin", posts=posts)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
