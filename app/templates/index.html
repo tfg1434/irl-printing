@@ -2,6 +2,8 @@
 {% import "bootstrap_wtf.html" as wtf %}
 
 {% block content %}
+    <script src="http://ajaxorg.github.io/ace-builds/src/ace.js"></script>
+
     <h1>Hi, {{ current_user.username }}!</h1>
 
     {{ wtf.quick_form(form) }}
@@ -13,6 +15,30 @@
     {{ wtf.quick_form(filter_form) }}
 
     <script>
+        // we will change the value of the textarea through ACE
+        function createEditor(id) {
+            // find the textarea
+            var textarea = document.querySelector("form textarea[id=" + id + "]");
+
+            // create ace editor 
+            var editor = ace.edit()
+            editor.container.style.height = "300px"
+            editor.session.setMode("ace/mode/python");
+            editor.session.setValue(textarea.value)
+            // replace textarea with ace
+            textarea.parentNode.insertBefore(editor.container, textarea)
+            textarea.style.display = "none"
+            // find the parent form and add submit event listener
+            var form = textarea
+            while (form && form.localName != "form") form = form.parentNode
+            form.addEventListener("submit", function() {
+                // update value of textarea to match value in ace
+                textarea.value = editor.getValue()
+            }, true)
+        }
+        createEditor("post")
+
+        // select form logic (i need a better way to filter)
         let my_select = document.getElementById("my");
         let onload = function() {
             let url = new URL(location.href);
