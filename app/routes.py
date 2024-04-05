@@ -30,11 +30,20 @@ def index():
 @app.route("/admin")
 @login_required
 def explore():
+    # a hack
     if current_user.username != "her":
         return redirect(url_for("index"))
 
     posts = db.session.scalars(sa.select(Post))
     return render_template("index.html", title="Admin", posts=posts)
+
+@app.route("/submission/<int:idx>")
+def submission(idx):
+    res = db.session.scalar(sa.select(Post).where(Post.id == idx))
+    if not res:
+        abort(404)
+
+    return render_template("submission.html", title="View Submission", code=res.body)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
