@@ -12,20 +12,20 @@ from app.models import *
 def index():
     form = PostForm()
     if form.validate_on_submit():
-        post = Post(body=form.post.data, author=current_user)
+        problem = db.session.scalar(sa.select(Problem).where(Problem.id==int(form.problem.data)))
+        post = Post(body=form.post.data, author=current_user, problem=problem)
         db.session.add(post)
         db.session.commit()
         flash("Code was succesfully submitted")
         return redirect(url_for("index"))
     
-    filter_form = FilterForm()
-    if request.args.get("my") == "on":
+    if current_user.username != "her":
         query = sa.select(Post).where(Post.author == current_user)
     else:
         query = sa.select(Post)
     posts = db.session.scalars(query).all()
 
-    return render_template('index.html', title='Home', form=form, filter_form=filter_form, posts=posts)
+    return render_template('index.html', title='Home', form=form, posts=posts)
 
 @app.route("/admin")
 @login_required

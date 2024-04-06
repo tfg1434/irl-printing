@@ -15,13 +15,22 @@ class User(UserMixin, db.Model):
     def __repr__(self):
         return f"<User {self.username}>"
 
+class Problem(db.Model):
+    id: so.Mapped[int] = so.mapped_column(primary_key=True)
+    name: so.Mapped[str] = so.mapped_column(sa.String(140), unique=True)
+    submissions: so.WriteOnlyMapped["Post"] = so.relationship(back_populates="problem")
+
+    def __repr__(self):
+        return f"<Problem {self.name}>"
+
 class Post(db.Model):
     id: so.Mapped[int] = so.mapped_column(primary_key=True)
     body: so.Mapped[str] = so.mapped_column(sa.String(1000000))
     timestamp: so.Mapped[datetime] = so.mapped_column(index=True, default=lambda: datetime.now(timezone.utc))
     user_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey(User.id), index=True)
-
     author: so.Mapped[User] = so.relationship(back_populates="posts")
+    problem_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey(Problem.id), index=True)
+    problem: so.Mapped[Problem] = so.relationship(back_populates="submissions")
 
     def __repr__(self):
         return f"<Post {self.body}>"

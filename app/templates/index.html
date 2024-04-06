@@ -6,8 +6,6 @@
 
     {{ wtf.quick_form(form) }}
 
-    {{ wtf.quick_form(filter_form) }}
-
     <table id="submissions" class="display">
         <thead>
             <tr>
@@ -20,10 +18,10 @@
         <tbody>
             {% for post in posts %}
             <tr>
-                <td><a href="{{url_for('index', idx=post.id)}}">{{post.id}}</a></td>
+                <td><a href="{{url_for('submission', idx=post.id)}}">{{post.id}}</a></td>
                 <td>{{moment(post.timestamp).format("LLL") }}</td>
                 <td>{{post.author.username}}</td>
-                <td>Problem ZZZ</td>
+                <td>{{post.problem.name}}</td>
             </tr>
             {% endfor %}
         </tbody>
@@ -31,7 +29,9 @@
 
     <script>
         // DataTable, wut dis?
-        $('#submissions').DataTable();
+        $('#submissions').DataTable({
+            order: [[0, "desc"]]
+        });
 
         // we will change the value of the textarea through ACE
         function createEditor(id) {
@@ -55,29 +55,6 @@
             }, true)
         }
         createEditor("post")
-
-        // select form logic (i need a better way to filter)
-        let my_select = document.getElementById("my");
-        let onload = function() {
-            let url = new URL(location.href);
-            if (url.searchParams.get("my") == "on") {
-                my_select.checked = true;
-            }
-        };
-        onload();
-
-        update = function() {
-            let url = new URL(location.href);
-            if (my_select.checked) {
-                url.searchParams.set("my", "on");
-            } else {
-                url.searchParams.delete("my");
-            }
-            if (url.toString() != location.href) {
-                location.href = url.toString();
-            }
-        };
-        my_select.onchange = update;
     </script>
 
 {% endblock %}
